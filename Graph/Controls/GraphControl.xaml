@@ -1,0 +1,324 @@
+﻿<UserControl x:Class="Graph.Controls.GraphControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Graph.Controls"
+             xmlns:s="clr-namespace:Graph.StyleSelectors"
+             xmlns:cv="clr-namespace:Graph.Converters"
+             xmlns:w="cls-namespace:WebSimulation"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border BorderBrush="LightGray"
+            BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel IsEnabled="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                <RadioButton GroupName="Options" 
+                             Name="Move"
+                             Style="{StaticResource Flag}"  
+                             Margin="1, 1, 1, 0" 
+                             Checked="Move_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="Двигать вершины"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Move.png"/>
+                </RadioButton>
+
+                <RadioButton GroupName="Options" 
+                             Style="{StaticResource Flag}" 
+                             Margin="1, 0, 1, 0" 
+                             Checked="Add_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="Добавить вершины"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Add.png"/>
+                </RadioButton>
+
+                <RadioButton GroupName="Options" 
+                             Style="{StaticResource Flag}" 
+                             Margin="1, 0, 1, 0" 
+                             Checked="Delete_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="DУдалить элементы"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Cross.png"/>
+                </RadioButton>
+
+                <RadioButton GroupName="Options" 
+                             Style="{StaticResource Flag}" 
+                             Margin="1, 0, 1, 0" 
+                             Checked="Connect_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="Соединить вершины"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Connect.png"/>
+                </RadioButton>
+
+                <RadioButton GroupName="Options" 
+                             Style="{StaticResource Flag}" 
+                             Margin="1, 0, 1, 0" 
+                             Checked="Edit_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="Редактировать дуги"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Edit.png"/>
+                </RadioButton>
+
+                <RadioButton GroupName="Options" 
+                             Style="{StaticResource Flag}" 
+                             Margin="1, 0, 1, 1" 
+                             Checked="Direction_Checked"
+                             IsChecked="{Binding Path=IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
+                    <RadioButton.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="Выбрать направление"/>
+                        </ToolTip>
+                    </RadioButton.ToolTip>
+                    <Image Source="../Images/Direction.png"/>
+                </RadioButton>
+            </StackPanel>
+
+            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="ItemsContainer"
+                                  ItemsSource="{Binding Elements}"
+                                  ItemContainerStyleSelector="{x:Static s:GraphStyleSelector.Instance}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <local:GraphGrid Background="White"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.Resources>
+                            <Style x:Key="Vertex" TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Top"/>         
+                                
+                                <Setter Property="Margin">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{x:Static cv:MarginConverter.Instance}">
+                                            <Binding Path="X"/>
+                                            <Binding Path="Y"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Grid x:Name="VertexGrid">
+                                                <Ellipse Width="{Binding Diametr}" 
+                                                         Height="{Binding Diametr}">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="Orange"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                                                                    <Setter Property="Fill" Value="Red"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Text="{Binding Number}" 
+                                                           TextAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect BlurRadius="15" ShadowDepth="0" Color="Blue"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+
+                            <Style x:Key="Edge" TargetType="ContentPresenter">
+                                <Setter Property="Width" Value="{Binding Area.Width}" />
+                                <Setter Property="Height" Value="{Binding Area.Height}" />
+                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Top"/>
+                                <Setter Property="Margin">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{x:Static cv:MarginConverter.Instance}">
+                                            <Binding Path="Area.Left"/>
+                                            <Binding Path="Area.Top"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                <Polyline StrokeThickness="2"                                                      
+                                                          Points="{Binding Path=Points, Converter={x:Static cv:EdgePathConverter.Instance}}">
+                                                    <Polyline.Style>
+                                                        <Style TargetType="Polyline">
+                                                            <Setter Property="Stroke" Value="Gray"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                                                                    <Setter Property="Stroke" Value="Red"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Polyline.Style>
+                                                </Polyline>
+                                                <Polygon Points="-5, 0, 0, 5, 5, 0"
+                                                         Canvas.Left="{Binding ArrowToAX}"
+                                                         Canvas.Top="{Binding ArrowToAY}">
+                                                    <Polygon.RenderTransform>
+                                                        <RotateTransform Angle="{Binding ArrowAAngle}"/>
+                                                    </Polygon.RenderTransform>
+                                                    <Polygon.Style>
+                                                        <Style TargetType="Polygon">
+                                                            <Setter Property="Fill" Value="Gray"/>                                                           
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                                                                    <Setter Property="Fill" Value="Red"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ToB}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HideArrows}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Polygon.Style>
+                                                </Polygon>
+                                                <Polygon Points="-5, 0, 0, 5, 5, 0"
+                                                         Canvas.Left="{Binding ArrowToBX}"
+                                                         Canvas.Top="{Binding ArrowToBY}">
+                                                    <Polygon.RenderTransform>
+                                                        <RotateTransform Angle="{Binding ArrowBAngle}"/>
+                                                    </Polygon.RenderTransform>
+                                                    <Polygon.Style>
+                                                        <Style TargetType="Polygon">
+                                                            <Setter Property="Fill" Value="Gray"/>                                                           
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                                                                    <Setter Property="Fill" Value="Red"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ToA}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HideArrows}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Polygon.Style>
+                                                </Polygon>
+                                            </Canvas>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect BlurRadius="15" ShadowDepth="0" Color="Blue"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+
+                            <Style x:Key="HalfEdge" TargetType="ContentPresenter">
+                                <Setter Property="Width" Value="{Binding Area.Width}" />
+                                <Setter Property="Height" Value="{Binding Area.Height}" />
+                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Top"/>
+                                <Setter Property="Margin">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{x:Static cv:MarginConverter.Instance}">
+                                            <Binding Path="Area.Left"/>
+                                            <Binding Path="Area.Top"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                <Polyline Stroke="Gray"
+                                                          StrokeThickness="2"   
+                                                          IsHitTestVisible="false"
+                                                          Points="{Binding Path=Points, Converter={x:Static cv:EdgePathConverter.Instance}}">
+                                                    <Polyline.Style>
+                                                        <Style TargetType="Polyline">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPointer}" Value="True">
+                                                                    <Setter Property="StrokeDashArray" Value="1 1"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Polyline.Style>
+                                                </Polyline>
+                                            </Canvas>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+
+                            <Style x:Key="Datagram" TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Top"/>
+                                <Setter Property="Margin">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{x:Static cv:MarginConverter.Instance}">
+                                            <Binding Path="X"/>
+                                            <Binding Path="Y"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Polygon Points="0,0,20,0,25,5,25,25,0,25"
+                                                         StrokeThickness="1"
+                                                         Stroke="Black"
+                                                         Fill="White"/>
+                                                <TextBlock Text="{Binding Packet.Number}" 
+                                                           TextAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ItemsControl.Resources>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

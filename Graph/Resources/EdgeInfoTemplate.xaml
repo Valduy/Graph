@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Graph.ViewModels"
+                    xmlns:cv="clr-namespace:Graph.Converters">
+
+    <DataTemplate DataType="{x:Type local:EdgeInfo}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0"
+                   Grid.Column="0"
+                   Content="{Binding VertexANumber, Converter={x:Static cv:VertexNumberConverter.Instance}}"                   
+                   Margin="5"/>
+
+            <TextBox Grid.Row="0"
+                     Grid.Column="1"
+                     Text="{Binding ToA, Converter={x:Static cv:BoolToTextConverter.Instance}}"
+                     Width="150"
+                     Margin="5"/>
+
+            <Label Grid.Row="1"
+                   Grid.Column="0"
+                   Content="{Binding VertexBNumber, Converter={x:Static cv:VertexNumberConverter.Instance}}"
+                   Margin="5"/>
+
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Text="{Binding ToB, Converter={x:Static cv:BoolToTextConverter.Instance}}"
+                     Width="150"
+                     Margin="5"/>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>
